@@ -1,13 +1,5 @@
 <?php
-define("YEAR", "2009");
 include("db.inc.php");
-$mysqli = new mysqli("localhost", DBUSER, DBPASS, DB);
-
-/* check connection */
-if (mysqli_connect_errno()) {
-    printf("Connect failed: %s\n", mysqli_connect_error());
-    exit();
-}
 
 $posts = array();
 // get all posts
@@ -91,14 +83,14 @@ foreach($posts as $post){
         }
 
         print("\r\n");
-        
+
 
         if(isset($visits[$teamid][$postid]['d'])){
             print("afg " . date( 'H:i',$visits[$teamid][$postid]['d']));
         }
 
         print("\r\n");
-	
+
 	if(isset($visits[$teamid][$postid]['x'])){
 	    print("X");
 	}
