@@ -27,7 +27,7 @@ CREATE TABLE `post` (
   `name` tinytext,
   `description` text,
   PRIMARY KEY (`postid`)
-) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -41,7 +41,7 @@ CREATE TABLE `team` (
   `teamid` int(11) NOT NULL AUTO_INCREMENT,
   `name` tinytext,
   PRIMARY KEY (`teamid`)
-) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
 
 --
