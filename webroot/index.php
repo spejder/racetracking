@@ -82,20 +82,22 @@ if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'straf') {
 
 $posts = array();
 // Get all posts.
-if ($stmt = $mysqli->prepare("SELECT p.name, p.postid, p.description FROM post p order by name")) {
+if ($stmt = $mysqli->prepare("SELECT p.name, p.postid FROM post p order by name")) {
   $stmt->execute();
 
   /* bind result variables */
-  $stmt->bind_result($name, $id, $description);
+  $stmt->bind_result($name, $id);
 
   /* fetch value */
   while ($stmt->fetch()) {
     $posts[$name]
-      = array("name" => $name, "postid" => $id, "description" => $description);
+      = array("name" => $name, "postid" => $id);
   }
 
   /* close statement */
   $stmt->close();
+}else{
+  die($mysqli->error);
 }
 
 // Get all teams, sorted.
@@ -190,43 +192,6 @@ $mysqli->close();
         </tr>
     </table>
     </form>
-	<form method="POST">
-	<table>
-	  <tr>
-	            <td align="center">Post</td>
-	            <td align="center">Hold</td>
-	            <td align="center">Straf</td>
-	            <td align="center" valign="middle" rowspan="2">
-		<button name="action" value="straf">S&aelig;t Straf</button>
-
-	</td>
-
-
-	</tr>
-
-	<tr>
-		    <td>
-	                <select name="postid">
-	                    <option value="" selected="true">&nbsp;</option>
-                        <?php foreach($posts as $post) : ?>
-	                    <option value="<?php echo $post['postid']?>"><?php echo $post['name']?></option>
-	                <?php endforeach; ?>
-	                </select>
-	            </td>
-	            <td>
-	                <select name="teamid">
-	                    <option value="" selected="true">&nbsp;</option>
-
-                       <?php foreach($teams as $team) : ?>
-	                    <option value="<?php echo $team['teamid']?>"><?php echo $team['name']?></option>
-	                <?php endforeach; ?>
-	                </select>
-	            </td>
-		    <td align="center">
-		<input type="checkbox" name="straf" value="true" checked="true">
-	</td>
-	</tr>
-	</table>
 
     <h1>Status</h1>
     <table border=1 class="maintable">
@@ -234,7 +199,7 @@ $mysqli->close();
             <tr>
                 <td style="border-top: 0px; border-left: 0px;" class="clear">&nbsp;</td>
             <?php foreach($teams as $team) : ?>
-                <td class="headercell"><?php echo $team['name']?></td>
+                <td class="headercell"><a href="edit?id=<?php echo $team['teamid']?>&t=t"><?php echo $team['name']?></a></td>
             <?php endforeach; ?>
             </tr>
         </thead>
@@ -245,7 +210,7 @@ $mysqli->close();
             ?>
 
                 <tr>
-                    <td class="headercell"><?php echo $post['name'] ?></td>
+                    <td class="headercell"><a href="edit?id=<?php echo $post['postid']?>&t=p"><?php echo $post['name'] ?></a></td>
                     <?php foreach($teams as $team) : ?>
                     <?php
                         $span = "";
