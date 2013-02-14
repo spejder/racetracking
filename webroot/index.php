@@ -82,16 +82,16 @@ if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'straf') {
 
 $posts = array();
 // Get all posts.
-if ($stmt = $mysqli->prepare("SELECT p.name, p.postid FROM post p order by name")) {
+if ($stmt = $mysqli->prepare("SELECT p.name, p.postid, p.canceled FROM post p order by name")) {
   $stmt->execute();
 
   /* bind result variables */
-  $stmt->bind_result($name, $id);
+  $stmt->bind_result($name, $id, $canceled);
 
   /* fetch value */
   while ($stmt->fetch()) {
     $posts[$name]
-      = array("name" => $name, "postid" => $id);
+      = array("name" => $name, "postid" => $id, "canceled" => $canceled);
   }
 
   /* close statement */
@@ -102,15 +102,15 @@ if ($stmt = $mysqli->prepare("SELECT p.name, p.postid FROM post p order by name"
 
 // Get all teams, sorted.
 $teams = array();
-if ($stmt = $mysqli->prepare("select t.name, t.teamid from team t order by t.name")) {
+if ($stmt = $mysqli->prepare("select t.name, t.teamid, t.canceled from team t order by t.name")) {
   $stmt->execute();
 
   // Bind result variables.
-  $stmt->bind_result($name, $teamid);
+  $stmt->bind_result($name, $teamid, $canceled);
 
   // Fetch value.
   while ($stmt->fetch()) {
-    $teams[] = array('name' => $name, 'teamid' => $teamid);
+    $teams[] = array('name' => $name, 'teamid' => $teamid, 'canceled' => $canceled);
   }
 
   // Close statement.
@@ -138,6 +138,7 @@ if ($stmt  = $mysqli->prepare("select t.teamid, v.postid, t.name, UNIX_TIMESTAMP
 
 /* close connection */
 $mysqli->close();
+$count = 0;
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -192,33 +193,37 @@ $mysqli->close();
         </tr>
     </table>
     </form>
-
     <h1>Status</h1>
     <table border=1 class="maintable">
         <thead>
             <tr>
                 <td style="border-top: 0px; border-left: 0px;" class="clear">&nbsp;</td>
             <?php foreach($teams as $team) : ?>
-                <td class="headercell"><a href="edit?id=<?php echo $team['teamid']?>&t=t"><?php echo $team['name']?></a></td>
+                <td class="headercell <?php echo $team['canceled'] == 1 ? 'canceled' : '';?>"><a href="edit?id=<?php echo $team['teamid']?>&t=t"><?php echo $team['name']?></a></td>
             <?php endforeach; ?>
             </tr>
         </thead>
         <tbody>
             <?php foreach($posts as $post) : ?>
             <?php
+              $mod_class = ($count % 2 == 0) ? 'even' : 'odd';
+              $count++;
               $hover = '';
+
+              $canc_class = ($post['canceled'] == 1) ? 'canceled' : '';
             ?>
 
-                <tr>
-                    <td class="headercell"><a href="edit?id=<?php echo $post['postid']?>&t=p"><?php echo $post['name'] ?></a></td>
+                <tr class="<?php echo $mod_class?> <?php echo $canc_class;?>">
+                    <td class="headercell <?php echo $mod_class?> <?php echo $canc_class?>"><a href="edit?id=<?php echo $post['postid']?>&t=p"><?php echo $post['name'] ?></a></td>
                     <?php foreach($teams as $team) : ?>
                     <?php
                         $span = "";
+                        $team_canc_class = !empty($canc_class) ? $canc_class : ($team['canceled'] == 1 ? 'canceled' : '');
                     ?>
                         <?php if(isset($visits[$team['teamid']][$post['postid']])) : ?>
-                            <?php echo render_visit_cell($visits[$team['teamid']][$post['postid']], $hover)?>
+                            <?php echo render_visit_cell($visits[$team['teamid']][$post['postid']], $hover, "$mod_class $team_canc_class")?>
                         <?php else : ?>
-                            <td class="empty"><span title="<?php echo $hover;?>"><br><br></span></td>
+                            <td class="empty <?php echo $mod_class?> <?php echo $team_canc_class?>"><span title="<?php echo $hover;?>"><br><br></span></td>
                         <?php endif ?>
                         <?php endforeach; ?>
                 </tr>
@@ -226,9 +231,12 @@ $mysqli->close();
         </tbody>
     </table>
 <br>
-<center>
-<a href="csv.php">Download som CSV</a>
-</center>
+    <div style="text-align: center">
+      <a href="csv.php">Download som CSV</a><br><br>
+      <a href="edit?t=t">Tilføj hold</a><br>
+      <a href="edit?t=p">Tilføj post</a><br>
+    </div>
+
     </body>
 </html>
 
@@ -240,13 +248,13 @@ $mysqli->close();
  * @param $hover
  * @return string
  */
-function render_visit_cell($visitdata, $hover) {
+function render_visit_cell($visitdata, $hover, $additional_class) {
   if (isset($visitdata['a'])) {
-    $return .= date('H:i', $visitdata['a']) . '<br />';
+    $return = date('H:i', $visitdata['a']) . '<br />';
     $class = "started";
   }
   else {
-    $return .= "<br />";
+    $return = "<br />";
   }
 
   if (isset($visitdata['d'])) {
@@ -262,5 +270,5 @@ function render_visit_cell($visitdata, $hover) {
     $class = "straf";
   }
 
-  return '<td class="' . $class . '"><span title="' . $hover . '">' . $return . '</span></td>';
+  return '<td class="' . $class . ' '. $additional_class .'"><span title="' . $hover . '">' . $return . '</span></td>';
 }

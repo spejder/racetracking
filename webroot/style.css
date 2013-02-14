@@ -1,3 +1,7 @@
+a {
+  color:black;
+}
+
 h1{
     font-size: 120%;
     text-align: center;
@@ -9,6 +13,23 @@ body {
 	margin: 10px;
 	}
 
+.headercell a{
+  text-decoration: none;
+}
+
+.headercell a:hover{
+  text-decoration: underline;
+}
+
+.maintable thead tr td.headercell {
+  padding: 2px;
+  border-bottom: 2px solid black;
+}
+
+.maintable tbody tr td:first-child{
+  padding: 2px;
+  border-right: 2px solid black;;
+}
 
 table {
     margin-left: auto;
@@ -30,6 +51,24 @@ table td{
     background-color: white;
 }
 
+table td.odd{
+  background-color: #eee;
+}
+
+td.canceled{
+  background-color: #fdd;
+
+}
+
+td.canceled.odd{
+  background-color: #ebb;
+
+}
+
+td.canceled a{
+
+}
+
 table.maintable td.clear {
     background-color: transparent;
 
@@ -38,7 +77,7 @@ table.maintable td.clear {
 table.maintable td {
     width: 5em;
     text-align: center;
-	
+
 }
 
 table.maintable td.status{
