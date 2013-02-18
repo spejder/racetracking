@@ -141,10 +141,10 @@ $mysqli->close();
 $count = 0;
 
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta charset='utf-8'>
         <title>CCMR Post-rapporterings system</title>
         <style type="text/css" title="currentStyle" media="screen">
             @import "style.css";
