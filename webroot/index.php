@@ -199,7 +199,7 @@ $count = 0;
             <tr>
                 <td style="border-top: 0px; border-left: 0px;" class="clear">&nbsp;</td>
             <?php foreach($teams as $team) : ?>
-                <td class="headercell <?php echo $team['canceled'] == 1 ? 'canceled' : '';?>"><a href="edit?id=<?php echo $team['teamid']?>&t=t"><?php echo $team['name']?></a></td>
+                <td class="headercell <?php echo $team['canceled'] == 1 ? 'canceled' : '';?>"><a href="edit.php?id=<?php echo $team['teamid']?>&t=t"><?php echo $team['name']?></a></td>
             <?php endforeach; ?>
             </tr>
         </thead>
@@ -214,7 +214,7 @@ $count = 0;
             ?>
 
                 <tr class="<?php echo $mod_class?> <?php echo $canc_class;?>">
-                    <td class="headercell <?php echo $mod_class?> <?php echo $canc_class?>"><a href="edit?id=<?php echo $post['postid']?>&t=p"><?php echo $post['name'] ?></a></td>
+                    <td class="headercell <?php echo $mod_class?> <?php echo $canc_class?>"><a href="edit.php?id=<?php echo $post['postid']?>&t=p"><?php echo $post['name'] ?></a></td>
                     <?php foreach($teams as $team) : ?>
                     <?php
                         $span = "";
