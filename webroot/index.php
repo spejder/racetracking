@@ -233,8 +233,8 @@ $count = 0;
 <br>
     <div style="text-align: center">
       <a href="csv.php">Download som CSV</a><br><br>
-      <a href="edit?t=t">Tilføj hold</a><br>
-      <a href="edit?t=p">Tilføj post</a><br>
+      <a href="edit?t=t">Tilf&oslash;j hold</a><br>
+      <a href="edit?t=p">Tilf&oslash;j post</a><br>
     </div>
 
     </body>

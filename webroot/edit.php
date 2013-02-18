@@ -146,7 +146,7 @@ else {
         </style>
     </head>
     <body>
-    <h1><?php echo $id !== FALSE ? 'Redigér' : 'Opret'?> <?php echo $type ?> </h1>
+    <h1><?php echo $id !== FALSE ? 'Rediger' : 'Opret'?> <?php echo $type ?> </h1>
     <form method="POST">
     <table>
       <?php
