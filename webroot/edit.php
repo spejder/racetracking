@@ -98,20 +98,16 @@ if (isset($_REQUEST['action']['execute'])) {
 $data = array();
 if ($id !== FALSE) {
   if ($t == 't') {
-    $stmt = $mysqli->prepare("SELECT t.name, t.smskey, t.canceled FROM team t WHERE teamid = ?");
+    $result = $mysqli->query("SELECT t.name, t.smskey, t.canceled FROM team t WHERE teamid = $id");
   }
   elseif ($t == 'p') {
-    $stmt = $mysqli->prepare("SELECT p.name, p.smskey, p.phonenumber, p.canceled FROM post p WHERE postid = ?");
+    $result = $mysqli->query("SELECT p.name, p.smskey, p.phonenumber, p.canceled FROM post p WHERE postid = $id");
   }
   else {
     die();
   }
 
-  $stmt->bind_param('i', $id);
-  $stmt->execute();
-
-  $result = $stmt->get_result();
-  $data =  $result->fetch_assoc();
+  $data =  $result->fetch_array(MYSQLI_ASSOC);
 
   if ($data === null) {
     die("Could not lookup data");
