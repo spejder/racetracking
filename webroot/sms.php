@@ -22,14 +22,15 @@ $mysqli->close();
 function report($input, $mysqli) {
   // TODO support matching both with an without post specification,
   // if spec is missing, determine post via number associated to the post.
-  preg_match("/spejder ([a-z0-9]+) (p[0-9]{1,2}) (h[0-9]{1,2}) ([0-9]{3,4}) ([0-9]{3,4})?/i", $input, $matches);
+  preg_match('/^spejder ([a-z0-9]+) (\w+) (\w+) (\d{1,2}:?\d{2}) (\d{1,2}:?\d{2})?/i', $input, $matches);
 
   $keyword = $matches[1];
   $post_smskey = $matches[2];
   $team_smskey = $matches[3];
 
-  $arrival_time = $matches[4];
-  $departure_time = $matches[5];
+  // Strip any colons.
+  $arrival_time = strtr($matches[4], ':', '');
+  $departure_time = strtr($matches[5], ':', '');
 
   // Get teamid.
   $teamid = get_team_id($team_smskey, $mysqli);
@@ -62,6 +63,8 @@ function report($input, $mysqli) {
       // we've crossed into a new day, subtract a day.
       $arrival_time -= 60 * 60 * 24;
     }
+
+    // TODO: input check, return an error if the team/post could not be found.
 
     // Unix-timestamps created, now format them.
     $departure_time = date("Y-m-d H:i:00", $departure_time);
