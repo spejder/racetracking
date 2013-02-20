@@ -6,7 +6,7 @@
 
 require_once 'db.inc.php';
 
-report($_REQUEST['message'], $mysqli);
+report($_REQUEST['message'], $_REQUEST['from'], $mysqli);
 
 $mysqli->close();
 
@@ -19,10 +19,11 @@ $mysqli->close();
  * @param object $mysqli
  *   DB connection.
  */
-function report($input, $mysqli) {
+function report($input, $from, $mysqli) {
+  $input = trim($input);
   // TODO support matching both with an without post specification,
   // if spec is missing, determine post via number associated to the post.
-  preg_match('/^spejder ([a-z0-9]+) (\w+) (\w+) (\d{1,2}:?\d{2}) (\d{1,2}:?\d{2})?/i', $input, $matches);
+  preg_match('/^spejder ([a-z0-9]+) (\w+ )?(\w+) (\d{1,2}:?\d{2}) (\d{1,2}:?\d{2})?/i', $input, $matches);
 
   $keyword = $matches[1];
   $post_smskey = $matches[2];
@@ -33,8 +34,8 @@ function report($input, $mysqli) {
   $departure_time = strtr($matches[5], ':', '');
 
   // Get teamid.
-  $teamid = get_team_id($team_smskey, $mysqli);
-  $postid = get_post_id($post_smskey, $mysqli);
+  list($teamid, $team_name) = get_team_id($team_smskey, $mysqli);
+  list($postid, $post_name) = get_post_id($post_smskey, $from, $mysqli);
 
   $year = date("Y");
   $month = date("n");
@@ -82,14 +83,14 @@ function report($input, $mysqli) {
 
       $stmt->close();
 
-      print ("Modtaget, hold $teamid ankommet til post $postid kl $arrival_time afgang kl $departure_time");
+      print ("Modtaget, $team_name ankommet til $post_name kl $arrival_time afgang kl $departure_time");
     }
   }
   else {
     // TODO: Describe the usage without post name
-    print ("Ugyldig kommando, syntax: spejder $keyword p<postnr> h<holdnr> <ankomst> <afgang> [x]\n");
-    print ("Eksempel 1: spejder $keyword p1 h2 2200 2300\n");
-    print ("Eksempel 2: spejder $keyword h4 2300 0200");
+    print ("Ugyldig kommando, syntax: spejder $keyword <postnr> <holdnr> <ankomst> <afgang>\n");
+    print ("Eksempel 1: spejder $keyword 1 1302 2200 2300\n");
+    // print ("Eksempel 2: spejder $keyword h4 2300 0200");
   }
 }
 
@@ -106,16 +107,16 @@ function report($input, $mysqli) {
  *   The id.
  */
 function get_team_id($team_smskey, $mysqli) {
-  if ($stmt = $mysqli->prepare("SELECT teamid FROM team where smskey = ?")) {
+  if ($stmt = $mysqli->prepare("SELECT teamid, name FROM team where smskey = ?")) {
     // Execute query.
     $stmt->bind_param('s', $team_smskey);
     $stmt->execute();
 
     // Bind result variables.
-    $stmt->bind_result($teamid);
+    $stmt->bind_result($teamid, $name);
 
     if ($stmt->fetch()) {
-      $return = $teamid;
+      $return = array($teamid, $name);
     }
     else {
       $return = FALSE;
@@ -141,17 +142,39 @@ function get_team_id($team_smskey, $mysqli) {
  * @return int
  *   The id.
  */
-function get_post_id($post_smskey, $mysqli) {
-  if ($stmt = $mysqli->prepare("SELECT postid FROM post where smskey = ?")) {
+function get_post_id($post_smskey, $from, $mysqli) {
+   if (strlen($from) == 10) {
+      $from = substr($from, 2);
+    }
+    // Lookup post from sender.
+    if ($stmt = $mysqli->prepare("SELECT postid, name FROM post where phonenumber = ?")) {
+      // Execute query.
+      $stmt->bind_param('s', $post_smskey);
+      $stmt->execute();
+
+      // Bind result variables.
+      $stmt->bind_result($teamid, $name);
+
+      if ($stmt->fetch()) {
+        return array($teamid, $name);
+      }else{
+        return FALSE;
+      }  
+    }else{
+      return FALSE; 
+    }
+  
+
+  if ($stmt = $mysqli->prepare("SELECT postid, name FROM post where smskey = ?")) {
     // Execute query.
     $stmt->bind_param('s', $post_smskey);
     $stmt->execute();
 
     // Bind result variables.
-    $stmt->bind_result($teamid);
+    $stmt->bind_result($teamid, $name);
 
     if ($stmt->fetch()) {
-      $return = $teamid;
+      $return = array($teamid, $name);
     }
     else {
       $return = FALSE;
