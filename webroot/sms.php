@@ -26,7 +26,7 @@ function report($input, $from, $mysqli) {
   preg_match('/^spejder ([a-z0-9]+) (\w+ )?(\w+) (\d{1,2}:?\d{2}) (\d{1,2}:?\d{2})?/i', $input, $matches);
 
   $keyword = $matches[1];
-  $post_smskey = $matches[2];
+  $post_smskey = trim($matches[2]);
   $team_smskey = $matches[3];
 
   // Strip any colons.
@@ -146,22 +146,25 @@ function get_post_id($post_smskey, $from, $mysqli) {
    if (strlen($from) == 10) {
       $from = substr($from, 2);
     }
-    // Lookup post from sender.
-    if ($stmt = $mysqli->prepare("SELECT postid, name FROM post where phonenumber = ?")) {
-      // Execute query.
-      $stmt->bind_param('s', $post_smskey);
-      $stmt->execute();
+    
+    if (empty($post_smskey)) {
+      // Lookup post from sender.
+      if ($stmt = $mysqli->prepare("SELECT postid, name FROM post where phonenumber = ?")) {
+	// Execute query.
+	$stmt->bind_param('s', $post_smskey);
+	$stmt->execute();
 
-      // Bind result variables.
-      $stmt->bind_result($teamid, $name);
+	// Bind result variables.
+	$stmt->bind_result($teamid, $name);
 
-      if ($stmt->fetch()) {
-        return array($teamid, $name);
+	if ($stmt->fetch()) {
+	  return array($teamid, $name);
+	}else{
+	  return FALSE;
+	}  
       }else{
-        return FALSE;
-      }  
-    }else{
-      return FALSE; 
+	return FALSE; 
+      }
     }
   
 
